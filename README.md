@@ -4,6 +4,9 @@ Centrale bron voor onze **Claude Code**-tooling: de gedeelde development-richtli
 én de slash-commands. Eén bron van waarheid, zodat niemand meer een eigen kopie
 van `CLAUDE.md` hoeft bij te houden.
 
+> Deze repo is **publiek** en bevat bewust géén secrets of klantdata — alleen
+> ontwikkelrichtlijnen en slash-commands. Daardoor is ophalen tokenloos.
+
 ## Inhoud van deze repo
 
 | Pad | Wat |
@@ -28,23 +31,20 @@ CLAUDE.md                 ← stub: laadt @.dooit/guidelines.md + repo-specifiek
 ## Nieuwe repo opzetten (eenmalige bootstrap)
 
 Odoo.sh levert een lege repo op. Draai in de **root van de nieuwe repo** één keer
-onderstaande regel. Die haalt de tooling op, zet de stub-`CLAUDE.md` neer en commit:
+onderstaande regel. Die haalt de tooling op, zet de stub-`CLAUDE.md` neer en commit.
+Geen token nodig:
 
 ```bash
-gh api repos/dooIT-nl/dev-guidelines/tarball -H "Accept: application/vnd.github+json" \
+curl -fsSL https://api.github.com/repos/dooIT-nl/dev-guidelines/tarball \
   | tar -xz --strip-components=1 --wildcards '*/commands/*' '*/templates/CLAUDE.md' '*/guidelines.md' \
-  && mkdir -p .claude/commands .dooit \
-  && mv commands/* .claude/commands/ && rmdir commands \
-  && mv templates/CLAUDE.md CLAUDE.md && rmdir templates \
-  && mv guidelines.md .dooit/guidelines.md \
-  && git add .claude CLAUDE.md .dooit \
-  && git commit -m "chore: bootstrap dooIT tooling" \
-  && odoosh-push
+ && mkdir -p .claude/commands .dooit \
+ && mv commands/* .claude/commands/ && rmdir commands \
+ && mv templates/CLAUDE.md CLAUDE.md && rmdir templates \
+ && mv guidelines.md .dooit/guidelines.md \
+ && git add .claude CLAUDE.md .dooit \
+ && git commit -m "chore: bootstrap dooIT tooling" \
+ && odoosh-push
 ```
-
-> Voorwaarde: de `gh` CLI is ingelogd met toegang tot `dooIT-nl` (`gh auth status`).
-> Geen `gh`? Zet een `GITHUB_TOKEN` (Odoo.sh environment variable, nooit in code)
-> en gebruik de `curl`-variant, of log in met `gh auth login`.
 
 Na de bootstrap zijn `/sync-guidelines` en `/vul-register` beschikbaar
 (evt. na een herstart van de Claude Code-sessie). Daarna houd je alles bij met
@@ -57,3 +57,4 @@ Na de bootstrap zijn `/sync-guidelines` en `/vul-register` beschikbaar
 - Repo-/klantspecifieke notities: onder de markering in de repo-root `CLAUDE.md`
   (die blijft bij een sync behouden).
 - Pushen op Odoo.sh: altijd `odoosh-push`, nooit `git push`.
+- Zet **geen** secrets of klantdata in deze repo — hij is publiek.

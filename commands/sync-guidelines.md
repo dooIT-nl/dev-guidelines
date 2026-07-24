@@ -2,7 +2,7 @@
 description: Sync de centrale dooIT-richtlijnen en slash-commands vanuit dooIT-nl/dev-guidelines
 ---
 
-Je synchroniseert de centrale dooIT-tooling vanuit de repo
+Je synchroniseert de centrale dooIT-tooling vanuit de (publieke) repo
 `github.com/dooIT-nl/dev-guidelines` naar de **huidige** repo. Doel: de gedeelde
 richtlijnen én slash-commands actueel houden zonder handmatig kopiëren.
 
@@ -16,18 +16,17 @@ bij een sync behouden blijven.
 
 ## Stappen
 
-1. **Controleer voorwaarden.** Werk vanuit de repo-root. Controleer dat de
-   `gh` CLI beschikbaar en ingelogd is (`gh auth status`). Zo niet: meld dit en
-   stop — vraag de gebruiker in te loggen of een token te zetten
-   (`GITHUB_TOKEN`), en val eventueel terug op de `curl`-variant.
+1. **Werk vanuit de repo-root** (`git rev-parse --show-toplevel`).
 
 2. **Haal de centrale repo op** als tarball en pak alleen de benodigde paden uit
-   naar een tijdelijke map:
+   naar een tijdelijke map. `-f` laat curl falen bij een HTTP-fout:
    ```bash
    TMP=$(mktemp -d)
-   gh api repos/dooIT-nl/dev-guidelines/tarball -H "Accept: application/vnd.github+json" \
+   curl -fsSL https://api.github.com/repos/dooIT-nl/dev-guidelines/tarball \
      | tar -xz -C "$TMP" --strip-components=1 --wildcards '*/commands/*' '*/guidelines.md'
    ```
+   Faalt curl (exit ≠ 0)? Meld dat de repo niet bereikbaar is (netwerk of naam)
+   en stop.
 
 3. **Plaats de bestanden:**
    ```bash
@@ -37,12 +36,12 @@ bij een sync behouden blijven.
    rm -rf "$TMP"
    ```
 
-4. **Toon wat er wijzigt.** Draai `git status --short` en `git --no-pager diff --stat`
-   zodat de gebruiker ziet wat er verandert. Als er niets is gewijzigd: meld
-   "richtlijnen zijn al up-to-date" en stop.
+4. **Toon wat er wijzigt.** Draai `git status --short` en
+   `git --no-pager diff --stat`. Niets gewijzigd? Meld "richtlijnen zijn al
+   up-to-date" en stop.
 
-5. **Committen en pushen** (alleen na akkoord van de gebruiker, en nooit direct op
-   `main` — branch eerst indien nodig, conform de guidelines §13):
+5. **Committen en pushen** (na akkoord van de gebruiker; nooit direct op `main` —
+   branch eerst indien nodig, conform de guidelines §13):
    ```bash
    git add .dooit/guidelines.md .claude/commands
    git commit -m "chore: sync dooIT guidelines + commands"
