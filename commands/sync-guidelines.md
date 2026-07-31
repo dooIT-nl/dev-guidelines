@@ -1,14 +1,16 @@
 ---
-description: Sync de centrale dooIT-richtlijnen en slash-commands vanuit dooIT-nl/dev-guidelines
+description: Sync de centrale dooIT-richtlijnen, slash-commands en het dooIT-logo vanuit dooIT-nl/dev-guidelines
 ---
 
 Je synchroniseert de centrale dooIT-tooling vanuit de (publieke) repo
 `github.com/dooIT-nl/dev-guidelines` naar de **huidige** repo. Doel: de gedeelde
-richtlijnen én slash-commands actueel houden zonder handmatig kopiëren.
+richtlijnen, slash-commands én het dooIT-logo actueel houden zonder handmatig
+kopiëren.
 
 ## Wat je ophaalt en waar het heen gaat
-- `guidelines.md`        → `.dooit/guidelines.md`      (de centrale richtlijnen)
-- `commands/*.md`        → `.claude/commands/`         (de gedeelde slash-commands)
+- `guidelines.md`   → `.dooit/guidelines.md`   (de centrale richtlijnen)
+- `commands/*.md`   → `.claude/commands/`       (de gedeelde slash-commands)
+- `assets/*`        → `.dooit/`                 (o.a. `dooit-icon.png` — het logo)
 
 **Niet aanraken:** de `CLAUDE.md` in de repo-root. Dat is de stub met
 `@.dooit/guidelines.md` plus eventuele repo-specifieke aanvullingen — die moeten
@@ -23,7 +25,7 @@ bij een sync behouden blijven.
    ```bash
    TMP=$(mktemp -d)
    curl -fsSL https://api.github.com/repos/dooIT-nl/dev-guidelines/tarball \
-     | tar -xz -C "$TMP" --strip-components=1 --wildcards '*/commands/*' '*/guidelines.md'
+     | tar -xz -C "$TMP" --strip-components=1 --wildcards '*/commands/*' '*/guidelines.md' '*/assets/*'
    ```
    Faalt curl (exit ≠ 0)? Meld dat de repo niet bereikbaar is (netwerk of naam)
    en stop.
@@ -33,6 +35,7 @@ bij een sync behouden blijven.
    mkdir -p .dooit .claude/commands
    cp "$TMP/guidelines.md" .dooit/guidelines.md
    cp "$TMP/commands/"*.md .claude/commands/
+   cp "$TMP/assets/"* .dooit/ 2>/dev/null || true
    rm -rf "$TMP"
    ```
 
@@ -43,12 +46,12 @@ bij een sync behouden blijven.
 5. **Committen en pushen** (na akkoord van de gebruiker; nooit direct op `main` —
    branch eerst indien nodig, conform de guidelines §13):
    ```bash
-   git add .dooit/guidelines.md .claude/commands
-   git commit -m "chore: sync dooIT guidelines + commands"
+   git add .dooit .claude/commands
+   git commit -m "chore: sync dooIT guidelines + commands + logo"
    odoosh-push
    ```
    Gebruik **`odoosh-push`**, nooit `git push`.
 
-6. **Meld het resultaat:** welke bestanden zijn bijgewerkt, en of er nieuwe of
-   verwijderde commands waren. Wijs erop dat nieuwe slash-commands pas na een
-   herstart van de Claude Code-sessie verschijnen.
+6. **Meld het resultaat:** welke bestanden zijn bijgewerkt (richtlijnen, commands,
+   logo), en of er nieuwe of verwijderde commands waren. Wijs erop dat nieuwe
+   slash-commands pas na een herstart van de Claude Code-sessie verschijnen.
